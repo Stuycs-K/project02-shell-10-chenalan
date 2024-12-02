@@ -9,6 +9,7 @@ int main(int argc, char *argv[]) {
     printf("Command: ");
 
     fgets(user_input, sizeof(user_input), stdin);
+    strip_newline(user_input);
 
     printf("%s\n", user_input);
 

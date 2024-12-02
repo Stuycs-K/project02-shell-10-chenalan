@@ -4,6 +4,25 @@
 #include "input.h"
 
 /*
+    Removes the trailing newline from a string, if one is found.
+    Used to remove the final newline from user input through stdin (i.e. when you press enter).
+
+    PARAMS
+        char *string: The string.
+
+    RETURNS
+        void
+*/
+void strip_newline(char *string) {
+    int location = strlen(string) - 1;
+    char final_char = string[location];
+
+    if (final_char == '\n') {
+        string[location] = 0;
+    }
+}
+
+/*
     Parses the arguments for a single command and its arguments into a
     null-terminated argument array, which can then be passed into execvp.
 
