@@ -2,24 +2,25 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "exec.h"
 #include "input.h"
 
 int main(int argc, char *argv[]) {
-    char user_input[512];
-    printf("Command: ");
+    while (1) {
+        char user_input[512];
+        printf("Command: $ ");
 
-    fgets(user_input, sizeof(user_input), stdin);
-    strip_newline(user_input);
+        fgets(user_input, sizeof(user_input), stdin);
+        strip_newline(user_input);
 
-    printf("%s\n", user_input);
+        char *commands[128];
+        parse_commands(user_input, commands);
 
-    char *commands[128];
-    parse_commands(user_input, commands);
-
-    char **ptr = commands;
-    while (*ptr) {
-        printf("%s\n", *ptr);
-        ptr++;
+        char **current_command = commands;
+        while (*current_command) {
+            printf("%s\n", *current_command);
+            current_command++;
+        }
     }
 
     return 0;
