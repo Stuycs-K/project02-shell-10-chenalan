@@ -18,7 +18,12 @@ int main(int argc, char *argv[]) {
 
         char **current_command = commands;
         while (*current_command) {
+            char *arg_array[128];
+            parse_command_args(*current_command, arg_array);
+
             printf("%s\n", *current_command);
+            exec(arg_array);
+
             current_command++;
         }
     }
