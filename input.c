@@ -1,5 +1,5 @@
-#include <string.h>
 #include <stddef.h>
+#include <string.h>
 
 #include "input.h"
 
@@ -12,7 +12,7 @@
     PARAMS
         char *line: The string to be parsed.
 
-        char **arg_array: Contains the whitespace-separated tokens in line. 
+        char **arg_array: Contains the whitespace-separated tokens in line.
             It will be null-terminated.
 
     RETURNS
@@ -29,4 +29,33 @@ void parse_command_args(char *line, char **arg_array) {
     }
 
     arg_array[arg_id] = NULL;
+}
+
+/*
+    Parses a string possibly containing multiple commands separated by semicolons
+    into a null-terminated command array.
+
+    Each command string can then be parsed into the command and its arguments
+    with parse_command_args
+
+    PARAMS
+        char *line: The string to be parsed.
+
+        char **arg_array: Contains the semicolon-separated tokens (i.e. commands)
+            in line. It will be null-terminated.
+
+    RETURNS
+        void
+*/
+void parse_commands(char *line, char **command_array) {
+    char *current = line;
+    char *token;
+
+    int index = 0;
+
+    while (token = strsep(&current, ";")) {
+        command_array[index++] = token;
+    }
+
+    command_array[index] = NULL;
 }

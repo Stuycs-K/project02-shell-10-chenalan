@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <unistd.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "input.h"
 
@@ -10,7 +10,16 @@ int main(int argc, char *argv[]) {
 
     fgets(user_input, sizeof(user_input), stdin);
 
-    // TODO: Split with semicolons first!
+    printf("%s\n", user_input);
+
+    char *commands[128];
+    parse_commands(user_input, commands);
+
+    char **ptr = commands;
+    while (*ptr) {
+        printf("%s\n", *ptr);
+        ptr++;
+    }
 
     return 0;
 }
