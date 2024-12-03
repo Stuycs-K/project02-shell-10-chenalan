@@ -35,8 +35,7 @@ void output_prompt() {
 }
 
 /*
-    Reads a line from stdin. The buffer size is dynamic. If fgets encounters
-    EOF, the shell terminates.
+    Reads a line from stdin. If fgets encounters EOF, the shell terminates.
 
     PARAMS
         None
@@ -45,35 +44,32 @@ void output_prompt() {
         A heap string containing the read line. Must be freed.
 */
 char *read_line() {
-    int current_line_size = 2;
-    char *line = malloc(sizeof(char) * current_line_size);
+    char *line = malloc(sizeof(char) * 512);
 
-    char *fgets_result;
-    while (1) {
-        fgets_result = fgets(line, current_line_size, stdin);
-
-        if (!fgets_result) {
-            if (feof(stdin)) { // Read EOF or Ctrl D, so terminate
-                exit(0);
-            } else { // Some IO error that isn't my problem
-
-            }
+    char *fgets_result = fgets(line, 512, stdin);
+    if (!fgets_result) {
+        if (feof(stdin)) {
+            exit(0);
         }
-
-        // If the line read from fgets is too long, we have to resize our buffer
-        // and read again
-        char *newline_location = strchr(line, '\n');
-        if (newline_location) {
-            break; // Our buffer has enough room
-        }
-
-        current_line_size *= 2;
-        line = realloc(line, sizeof(char) * current_line_size);
     }
-
-    printf("%s\n", line);
 
     strip_newline(line);
 
     return line;
+}
+
+char **get_command_array(char *line) {
+    char *commands[128];
+    parse_commands(line, commands);
+}
+
+void run_commands(char **command_array) {
+    char **current_command = command_array;
+    while (*current_command) {
+        char *arg_array[128];
+        parse_command_args(*current_command, arg_array);
+        exec(arg_array);
+
+        current_command++;
+    }
 }

@@ -25,28 +25,12 @@ int main(int argc, char *argv[]) {
 
         line = read_line();
 
-        /*
-        char *fgets_result = fgets(user_input, sizeof(user_input), stdin);
-        if (!fgets_result) {
-            if (feof(stdin)) {
-                exit(0);
-            }
-        }
-
-        strip_newline(user_input);
-        */
-
         char *commands[128];
         parse_commands(line, commands);
 
-        char **current_command = commands;
-        while (*current_command) {
-            char *arg_array[128];
-            parse_command_args(*current_command, arg_array);
-            exec(arg_array);
+        run_commands(commands);
 
-            current_command++;
-        }
+        free(line);
     }
 
     return 0;
