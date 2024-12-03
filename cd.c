@@ -1,4 +1,6 @@
+#include <errno.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "cd.h"
@@ -26,6 +28,30 @@ char *get_wd_absolute(void) {
     return path_buffer;
 }
 
-void cd(char *path) {
-    return;
+/*
+    Runs the cd command. Changes the working directory to the one requested,
+    returning errno if something goes wrong.
+
+    PARAMS
+        char **argv: The argument array normally passed into execvp. The first
+            argument should be "cd," and the next could either contain NULL or
+            a path
+
+    RETURNS
+        None, but exits with either errno or 0
+*/
+void cd(char **argv) {
+    char *path = argv[1];
+    // TODO: If we just call "cd", we go back to the home directory
+    if (!path) {
+        path = "~";
+    }
+
+    int result = chdir(path);
+
+    if (result == -1) {
+        exit(errno);
+    }
+
+    exit(0);
 }

@@ -6,6 +6,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include "cd.h"
 #include "exec.h"
 
 /*
@@ -44,12 +45,19 @@ int exec(char **args) {
     int status = 0;
 
     if (pid == 0) {
-        int result = execvp(args[0], args);
-        if (result == -1) {
-            exit(errno);
+        char *command = args[0];
+
+        if (!strcmp(command, "cd")) {
+            cd(args);
         } else {
-            exit(0);
+            int result = execvp(args[0], args);
+            if (result == -1) {
+                exit(errno);
+            } else {
+                exit(0);
+            }
         }
+
     } else if (pid > 0) {
         waitpid(pid, &status, 0);
 

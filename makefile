@@ -15,7 +15,7 @@ main.o: main.c input.h
 input.o: input.c
 	@gcc -c input.c
 
-exec.o: exec.c
+exec.o: exec.c cd.h
 	@gcc -c exec.c
 
 cd.o: cd.c

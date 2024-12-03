@@ -3,6 +3,6 @@
 
 char *get_wd_absolute(void);
 
-void cd(char *path);
+int cd(char **argv);
 
 #endif
