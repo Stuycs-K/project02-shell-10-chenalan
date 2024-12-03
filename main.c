@@ -1,14 +1,18 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
+#include "cd.h"
 #include "exec.h"
 #include "input.h"
 
 int main(int argc, char *argv[]) {
     while (1) {
         char user_input[512];
-        printf("Command: $ ");
+
+        char *wd = get_wd_absolute();
+        printf("%s$ ", wd);
 
         fgets(user_input, sizeof(user_input), stdin);
         strip_newline(user_input);
@@ -24,6 +28,8 @@ int main(int argc, char *argv[]) {
 
             current_command++;
         }
+
+        free(wd);
     }
 
     return 0;
