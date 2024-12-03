@@ -12,7 +12,8 @@ int main(int argc, char *argv[]) {
         char user_input[512];
 
         char *wd = get_wd_absolute();
-        replace_homedir_in_path(wd);
+        shorten_homedir_in_path(wd);
+
         printf("%s$ ", wd);
         fflush(stdout);
 

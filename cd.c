@@ -59,25 +59,57 @@ char *get_homedir(void) {
         char *wd: The buffer containing the absolute path. Will be modified.
 
     RETURNS
-        None
+        None. There's no need to create a new buffer, as path will
+        have enough space for the shortened path.
 */
-void replace_homedir_in_path(char *wd) {
+void shorten_homedir_in_path(char *path) {
     char *homedir = get_homedir();
-    char *homedir_location = strstr(wd, homedir);
+    char *homedir_location = strstr(path, homedir);
 
     // Either there's no home directory, or it's not at the beginning of the path
-    if (!homedir_location || homedir_location != wd) {
+    if (!homedir_location || homedir_location != path) {
         free(homedir);
         return;
     }
 
-    char *remaining_path = wd + strlen(homedir);
+    char *remaining_path = path + strlen(homedir);
 
-    wd[0] = '~';
-    wd[1] = 0;
-    strcat(wd, remaining_path);
+    path[0] = '~';
+    path[1] = 0;
+    strcat(path, remaining_path);
 
     free(homedir);
+}
+
+/*
+    Used internally. Expands "~" in a path by replacing it with the home directory.
+
+    PARAMS
+        char *path: The buffer containing the path relative to the home directory.
+
+    RETURNS
+        A new buffer containing the expanded path.
+        If the path does not contain "~", returns a copy of the path passed in.
+*/
+char *expand_homedir_in_path(char *path) {
+    if (path[0] != '~') {
+        char *copy = malloc(sizeof(char) * strlen(path));
+        strcpy(copy, path);
+
+        return copy;
+    }
+
+    char *homedir = get_homedir();
+
+    char *remaining_path = path + 1;
+
+    char *expanded_path = malloc(sizeof(char) * (strlen(homedir) + strlen(remaining_path)));
+    strcpy(expanded_path, homedir);
+    strcat(expanded_path, remaining_path);
+
+    free(homedir);
+
+    return expanded_path;
 }
 
 /*
@@ -96,20 +128,19 @@ void replace_homedir_in_path(char *wd) {
 */
 int cd(char **argv) {
     char *path = argv[1];
-    char *homedir = NULL;
 
-    int result = 0;
+    char *expanded_path = NULL;
 
-    // "cd" or "cd ~"
-    if (!path || !strcmp(path, "~")) {
-        result = chdir(get_homedir());
+    // "cd" becomes "cd ~"
+    if (!path) {
+        expanded_path = expand_homedir_in_path("~");
     } else {
-        result = chdir(path);
+        expanded_path = expand_homedir_in_path(path);
     }
 
-    if (homedir) {
-        free(homedir);
-    }
+    int result = chdir(expanded_path);
+
+    free(expanded_path);
 
     if (result == -1) {
         return errno;
