@@ -74,6 +74,11 @@ void run_process(char **args) {
 int exec(char **args) {
     char *command = args[0];
 
+    // Do nothing if there's no command! This is so simply pressing enter doesn't output an error message.
+    if (command[0] == 0) {
+        return 0;
+    }
+
     // Run our built-in commands here. Don't fork for any of them.
     if (!strcmp(command, "cd")) {
         cd(args);

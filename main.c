@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 #include "cd.h"
 #include "exec.h"
 #include "input.h"
+#include "process_manager.h"
 
 int main(int argc, char *argv[]) {
     while (1) {
