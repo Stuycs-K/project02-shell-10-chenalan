@@ -1,3 +1,4 @@
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,9 +8,15 @@
 #include "cd.h"
 #include "exec.h"
 #include "input.h"
-#include "process_manager.h"
+
+static void ignore_shell_signal(int signo) {
+    printf("\n");
+}
 
 int main(int argc, char *argv[]) {
+    signal(SIGINT, ignore_shell_signal);
+    signal(SIGQUIT, ignore_shell_signal);
+
     while (1) {
         char user_input[512];
 

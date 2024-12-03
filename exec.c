@@ -46,7 +46,6 @@ void run_process(char **args) {
     int status = 0;
 
     if (pid == 0) {
-
         int result = execvp(args[0], args);
         if (result == -1) {
             exit(errno);
@@ -55,7 +54,7 @@ void run_process(char **args) {
         }
 
     } else if (pid > 0) {
-        waitpid(pid, &status, 0);
+        pid_t child_pid = waitpid(pid, &status, 0);
 
         print_execvp_error(status);
     }
