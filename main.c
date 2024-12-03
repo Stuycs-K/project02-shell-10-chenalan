@@ -8,6 +8,7 @@
 #include "cd.h"
 #include "exec.h"
 #include "input.h"
+#include "shell.h"
 
 static void ignore_shell_signal(int signo) {
     printf("\n");
@@ -17,18 +18,14 @@ int main(int argc, char *argv[]) {
     signal(SIGINT, ignore_shell_signal);
     signal(SIGQUIT, ignore_shell_signal);
 
+    char *line;
+
     while (1) {
-        char user_input[512];
+        output_prompt();
 
-        char *wd = get_wd_absolute();
-        shorten_homedir_in_path(wd);
+        line = read_line();
 
-        // If stdin's been redirected, don't output the prompt!
-        if (isatty(0)) {
-            printf("%s$ ", wd);
-            fflush(stdout);
-        }
-
+        /*
         char *fgets_result = fgets(user_input, sizeof(user_input), stdin);
         if (!fgets_result) {
             if (feof(stdin)) {
@@ -37,9 +34,10 @@ int main(int argc, char *argv[]) {
         }
 
         strip_newline(user_input);
+        */
 
         char *commands[128];
-        parse_commands(user_input, commands);
+        parse_commands(line, commands);
 
         char **current_command = commands;
         while (*current_command) {
@@ -49,8 +47,6 @@ int main(int argc, char *argv[]) {
 
             current_command++;
         }
-
-        free(wd);
     }
 
     return 0;
