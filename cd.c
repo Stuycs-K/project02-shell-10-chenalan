@@ -9,7 +9,7 @@
     PARAMS
         None
 
-    RETURN
+    RETURNS
         A heap string with the absolute path. Must be freed.
 */
 char *get_wd_absolute(void) {
