@@ -78,6 +78,8 @@ int exec(char **args) {
     if (!strcmp(command, "cd")) {
         cd(args);
         return 0;
+    } else if (!strcmp(command, "exit")) {
+        exit(0);
     }
 
     run_process(args);

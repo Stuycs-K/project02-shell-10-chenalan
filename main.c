@@ -14,10 +14,19 @@ int main(int argc, char *argv[]) {
         char *wd = get_wd_absolute();
         shorten_homedir_in_path(wd);
 
-        printf("%s$ ", wd);
-        fflush(stdout);
+        // If stdin's been redirected, don't output the prompt!
+        if (isatty(0)) {
+            printf("%s$ ", wd);
+            fflush(stdout);
+        }
 
-        fgets(user_input, sizeof(user_input), stdin);
+        char *fgets_result = fgets(user_input, sizeof(user_input), stdin);
+        if (!fgets_result) {
+            if (feof(stdin)) {
+                exit(0);
+            }
+        }
+
         strip_newline(user_input);
 
         char *commands[128];

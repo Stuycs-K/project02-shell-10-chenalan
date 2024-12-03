@@ -88,7 +88,7 @@ void shorten_homedir_in_path(char *path) {
         char *path: The buffer containing the path relative to the home directory.
 
     RETURNS
-        A new buffer containing the expanded path.
+        A new heap buffer containing the expanded path. Must be freed.
         If the path does not contain "~", returns a copy of the path passed in.
 */
 char *expand_homedir_in_path(char *path) {
@@ -124,7 +124,7 @@ char *expand_homedir_in_path(char *path) {
             a path.
 
     RETURNS
-        Either errno or 0
+        0 if chdir succeeded, errno otherwise
 */
 int cd(char **argv) {
     char *path = argv[1];
