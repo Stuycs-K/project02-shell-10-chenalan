@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <pwd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -29,6 +30,28 @@ char *get_wd_absolute(void) {
 }
 
 /*
+    Returns a string containing the home directory
+
+    PARAMS
+        None
+
+    RETURNS
+        A heap string with the home directory. Must be freed.
+*/
+char *get_homedir(void) {
+    char *homedir = getenv("HOME");
+
+    if (!homedir) {
+        homedir = getpwuid(getuid())->pw_dir;
+    }
+
+    char *path_buffer = malloc(sizeof(char) * strlen(homedir));
+    strcpy(path_buffer, homedir);
+
+    return path_buffer;
+}
+
+/*
     Runs the cd command. Changes the working directory to the one requested,
     returning errno if something goes wrong.
 
@@ -42,12 +65,19 @@ char *get_wd_absolute(void) {
 */
 int cd(char **argv) {
     char *path = argv[1];
-    // TODO: If we just call "cd", we go back to the home directory
-    if (!path) {
-        path = "~";
+    char *homedir = NULL;
+
+    if (!path || !strcmp(path, "~")) {
+        homedir = get_homedir();
+        path = homedir;
     }
 
     int result = chdir(path);
+
+    if (homedir) {
+        free(homedir);
+        path = NULL;
+    }
 
     if (result == -1) {
         return errno;
