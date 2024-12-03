@@ -32,30 +32,26 @@ void print_execvp_error(int exit_status) {
 
 /*
     Forks to run a command with execvp, for which the parent process waits.
+    Errors are outputted to the shell with printf (will change).
 
     PARAMS
         char **args: The array of command arguments. Unused for parent process.
 
     RETURNS
-        ?
+        None
 */
-int exec(char **args) {
+void run_process(char **args) {
     pid_t pid = fork();
 
     int status = 0;
 
     if (pid == 0) {
-        char *command = args[0];
 
-        if (!strcmp(command, "cd")) {
-            cd(args);
+        int result = execvp(args[0], args);
+        if (result == -1) {
+            exit(errno);
         } else {
-            int result = execvp(args[0], args);
-            if (result == -1) {
-                exit(errno);
-            } else {
-                exit(0);
-            }
+            exit(0);
         }
 
     } else if (pid > 0) {
@@ -63,6 +59,28 @@ int exec(char **args) {
 
         print_execvp_error(status);
     }
+}
+
+/*
+    Runs the command. If the command is built-in, such as "cd," we directly
+    call the related function. Otherwise, we fork a new process and use execvp.
+
+    PARAMS
+        char **args: The array of command arguments.
+
+    RETURNS
+        ?
+*/
+int exec(char **args) {
+    char *command = args[0];
+
+    // Run our built-in commands here. Don't fork for any of them.
+    if (!strcmp(command, "cd")) {
+        cd(args);
+        return 0;
+    }
+
+    run_process(args);
 
     return 0;
 }
