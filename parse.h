@@ -1,5 +1,5 @@
-#ifndef INPUT_H
-#define INPUT_H
+#ifndef PARSE_H
+#define PARSE_H
 
 void strip_newline(char *string);
 

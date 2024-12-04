@@ -6,7 +6,7 @@
 
 #include "cd.h"
 #include "exec.h"
-#include "input.h"
+#include "parse.h"
 #include "shell.h"
 
 /*
@@ -72,6 +72,7 @@ void run_commands(char **command_array) {
     while (*current_command) {
         char *arg_array[128];
         parse_command_args(*current_command, arg_array);
+
         exec(arg_array);
 
         current_command++;

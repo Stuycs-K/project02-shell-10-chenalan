@@ -1,7 +1,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "input.h"
+#include "parse.h"
 
 /*
     Removes the trailing newline from a string, if one is found.

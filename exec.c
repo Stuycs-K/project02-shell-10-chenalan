@@ -38,9 +38,9 @@ void print_execvp_error(int exit_status) {
         char **args: The array of command arguments. Unused for parent process.
 
     RETURNS
-        None
+        The parent process returns the child process's exit status.
 */
-void run_process(char **args) {
+int run_process(char **args) {
     pid_t pid = fork();
 
     int status = 0;
@@ -57,6 +57,8 @@ void run_process(char **args) {
         pid_t child_pid = waitpid(pid, &status, 0);
 
         print_execvp_error(status);
+
+        return status;
     }
 }
 
@@ -68,7 +70,7 @@ void run_process(char **args) {
         char **args: The array of command arguments.
 
     RETURNS
-        ?
+        The exit status of the child process that ran the command.
 */
 int exec(char **args) {
     char *command = args[0];
@@ -86,7 +88,5 @@ int exec(char **args) {
         exit(0);
     }
 
-    run_process(args);
-
-    return 0;
+    return run_process(args);
 }
