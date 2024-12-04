@@ -5,10 +5,10 @@
 #include <unistd.h>
 
 #include "cd.h"
+#include "command.h"
 #include "exec.h"
 #include "parse.h"
 #include "shell.h"
-#include "command.h"
 
 /*
     Flag for whether the shell is currently running a command
@@ -80,17 +80,14 @@ char *read_line() {
     RETURNS
         None.
 */
-void run_commands(char **command_array) {
-    char **current_command = command_array;
-    while (*current_command) {
-        char *arg_array[128];
-        parse_command_args(*current_command, arg_array);
-
-        int exit_status = exec(arg_array);
+void run_commands(CommandChain **command_chains) {
+    CommandChain **current_chain = command_chains;
+    while (*current_chain) {
+        exec_chain(*current_chain);
+        // int exit_status = exec(arg_array);
 
         // TODO: Handle errors
-
-        current_command++;
+        current_chain++;
     }
 }
 
@@ -108,17 +105,21 @@ void run_commands(char **command_array) {
 */
 void shell_loop() {
     char *line;
+    char *tokens[2048];
+
+    CommandChain **command_chains;
 
     output_prompt();
 
     line = read_line();
     line = format_line(line);
 
-    char *commands[256];
-    parse_commands(line, commands);
+    separate_tokens(line, tokens);
+
+    command_chains = build_command_chains(tokens);
 
     shell_status = SHELL_STATUS_EXEC;
-    run_commands(commands);
+    run_commands(command_chains);
     shell_status = SHELL_STATUS_IDLE;
 
     free(line);

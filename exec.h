@@ -3,4 +3,6 @@
 
 int exec(char **args);
 
+int exec_chain(CommandChain *chain);
+
 #endif

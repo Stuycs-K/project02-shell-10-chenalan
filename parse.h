@@ -7,8 +7,8 @@ void parse_commands(char *line, char **command_array);
 
 char *format_line(char *line);
 
-char *parse_stdin_redirect(char **arg_array);
+void separate_tokens(char *line, char **tokens);
 
-char *parse_stdout_redirect(char **arg_array);
+CommandChain **build_command_chains(char **tokens);
 
 #endif

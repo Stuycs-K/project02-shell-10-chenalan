@@ -1,9 +1,9 @@
 #include <stddef.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
-#include "parse.h"
 #include "command.h"
+#include "parse.h"
 
 /*
     Parses the arguments for a single command and its arguments into a
@@ -97,7 +97,18 @@ char *format_line(char *line) {
     return expanded_line;
 }
 
-char *separate_tokens(char *line, char **tokens) {
+/*
+    Inserts whitespace-separated tokens into an array.
+
+    PARAMS
+        char *line: The input line.
+
+        char **tokens: The array into which each token will be inserted.
+
+    RETURNS
+        None
+*/
+void separate_tokens(char *line, char **tokens) {
     char *current = line;
     char *token;
 
@@ -110,11 +121,11 @@ char *separate_tokens(char *line, char **tokens) {
     tokens[index] = NULL;
 }
 
-Command **build_command_arrays(char **tokens) {
-    Command ***command_structure = malloc(sizeof(Command **) * 512);
+CommandChain **build_command_chains(char **tokens) {
+    CommandChain **command_chains = calloc(sizeof(CommandChain *), 512);
+    command_chains[0] = new_command_chain(); // Initialize 1 chain
 
-    int current_command_chain = 0; // Which Command list (Command **)
-    int current_command = 0; // Which Command in the list (Command *)
+    int current_command_chain = 0; // Which command chain
 
     int build_new_command_flag = 1; // Should we build a new command? Set to 1 after reading a special character
 
@@ -122,27 +133,44 @@ Command **build_command_arrays(char **tokens) {
     char *current_token;
 
     while (current_token = *token_pointer) {
-        if (!strcmp(current_token, "|")) { // PIPE
+        CommandChain *current_chain = command_chains[current_command_chain];
 
+        if (!strcmp(current_token, "|")) { // PIPE
+            build_new_command_flag = 1;
         } else if (!strcmp(current_token, "<")) {
+
+            Command *command = last_command(current_chain);
+            char *file_name = *(++token_pointer); // Consume next token as file input
+            set_in_file(command, file_name);
+
+            build_new_command_flag = 1;
 
         } else if (!strcmp(current_token, ">")) {
 
-        } else if (!strcmp(current_token, ";")) { // Build a new command array
-            command_structure[current_command_chain++] = malloc(sizeof(Command *) * 512);
-            build_new_command_flag = 1; // Next token we read should go to a new command
+            Command *command = last_command(current_chain);
+            char *file_name = *(++token_pointer); // Consume next token as file input
+            set_out_file(command, file_name);
+
+            build_new_command_flag = 1;
+
+        } else if (!strcmp(current_token, ";")) { // Build a new command chain
+
+            command_chains[++current_command_chain] = new_command_chain();
+
+            build_new_command_flag = 1; // Next token (if any) we read should go to a new command
+
         } else {
+
             Command *command;
 
             if (build_new_command_flag) {
                 command = new_command();
 
-                // Advance command count for the current chain
-                command_structure[current_command_chain][++current_command] = command;
+                insert_command(current_chain, command);
 
                 build_new_command_flag = 0;
             } else {
-                command = command_structure[current_command_chain][current_command];
+                command = last_command(current_chain);
             }
 
             // Add to args list
@@ -151,30 +179,6 @@ Command **build_command_arrays(char **tokens) {
 
         token_pointer++;
     }
-}
 
-char *parse_stdin_redirect(char **arg_array) {
-    char **current = arg_array;
-
-    while (*current) {
-        if (!strcmp(*current, "<")) {
-            return *(current + 1); // The next string in the argument array will be the file name
-        }
-        current++;
-    }
-
-    return NULL;
-}
-
-char *parse_stdout_redirect(char **arg_array) {
-    char **current = arg_array;
-
-    while (*current) {
-        if (!strcmp(*current, ">")) {
-            return *(current + 1); // The next string in the argument array will be the file name
-        }
-        current++;
-    }
-
-    return NULL;
+    return command_chains;
 }
