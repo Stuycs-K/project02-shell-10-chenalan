@@ -112,6 +112,7 @@ void shell_loop() {
     output_prompt();
 
     line = read_line();
+    line = format_line(line);
 
     char *commands[256];
     parse_commands(line, commands);

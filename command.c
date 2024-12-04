@@ -12,6 +12,10 @@ Command *new_command() {
     return command;
 }
 
+void insert_arg(Command *command, char *arg) {
+
+}
+
 void set_in_file(Command *command, char *file_name) {
     command->in_file = malloc(sizeof(char) * strlen(file_name));
     strcpy(command->in_file, file_name);
