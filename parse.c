@@ -4,25 +4,6 @@
 #include "parse.h"
 
 /*
-    Removes the trailing newline from a string, if one is found.
-    Used to remove the final newline from user input through stdin (i.e. when you press enter).
-
-    PARAMS
-        char *string: The string.
-
-    RETURNS
-        void
-*/
-void strip_newline(char *string) {
-    int location = strlen(string) - 1;
-    char final_char = string[location];
-
-    if (final_char == '\n') {
-        string[location] = 0;
-    }
-}
-
-/*
     Parses the arguments for a single command and its arguments into a
     null-terminated argument array, which can then be passed into execvp.
 
@@ -77,4 +58,30 @@ void parse_commands(char *line, char **command_array) {
     }
 
     command_array[index] = NULL;
+}
+
+char *parse_stdin_redirect(char **arg_array) {
+    char **current = arg_array;
+
+    while (*current) {
+        if (!strcmp(*current, "<")) {
+            return *(current + 1); // The next string in the argument array will be the file name
+        }
+        current++;
+    }
+
+    return NULL;
+}
+
+char *parse_stdout_redirect(char **arg_array) {
+    char **current = arg_array;
+
+    while (*current) {
+        if (!strcmp(*current, ">")) {
+            return *(current + 1); // The next string in the argument array will be the file name
+        }
+        current++;
+    }
+
+    return NULL;
 }

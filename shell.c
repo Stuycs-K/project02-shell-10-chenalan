@@ -60,7 +60,12 @@ char *read_line() {
         }
     }
 
-    strip_newline(line);
+    int location = strlen(line) - 1;
+    char final_char = line[location];
+
+    if (final_char == '\n') {
+        line[location] = 0;
+    }
 
     return line;
 }
