@@ -28,7 +28,7 @@ int shell_status = SHELL_STATUS_IDLE;
 */
 void output_prompt() {
     // If stdin's been redirected, don't output the prompt!
-    if (!isatty(0)) {
+    if (!isatty(STDIN_FILENO)) {
         return;
     }
 
@@ -81,6 +81,8 @@ void run_commands(char **command_array) {
         parse_command_args(*current_command, arg_array);
 
         int exit_status = exec(arg_array);
+
+        // TODO: Handle errors
 
         current_command++;
     }

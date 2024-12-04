@@ -59,6 +59,9 @@ int run_process(char **args) {
         print_execvp_error(status);
 
         return status;
+    } else {
+        perror("[exec]: Fork error");
+        return -1;
     }
 }
 
