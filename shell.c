@@ -4,10 +4,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "shell.h"
 #include "cd.h"
 #include "exec.h"
 #include "input.h"
+#include "shell.h"
 
 /*
     Prints the shell prompt. If stdin has been redirected, this prints nothing.
@@ -58,11 +58,15 @@ char *read_line() {
     return line;
 }
 
-char **get_command_array(char *line) {
-    char *commands[128];
-    parse_commands(line, commands);
-}
+/*
+    Executes each command.
 
+    PARAMS
+        char **command_array: An array of commands, not yet separated into arguments.
+
+    RETURNS
+        None.
+*/
 void run_commands(char **command_array) {
     char **current_command = command_array;
     while (*current_command) {
@@ -72,4 +76,29 @@ void run_commands(char **command_array) {
 
         current_command++;
     }
+}
+
+/*
+    Runs the main loop of the shell. Outputs the prompt, reads user input, parses,
+    and runs commands.
+
+    PARAMS
+        None.
+
+    RETURNS
+        None.
+*/
+void shell_loop() {
+    char *line;
+
+    output_prompt();
+
+    line = read_line();
+
+    char *commands[256];
+    parse_commands(line, commands);
+
+    run_commands(commands);
+
+    free(line);
 }
