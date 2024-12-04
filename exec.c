@@ -48,13 +48,6 @@ int run_process(char **args) {
     int status = 0;
 
     if (pid == 0) {
-        char *in_file = parse_stdin_redirect(args);
-        char *out_file = parse_stdout_redirect(args);
-
-        if (in_file) {
-            redirect_stdin(in_file);
-        }
-
         int result = execvp(args[0], args);
         if (result == -1) {
             exit(errno);

@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "parse.h"
 
@@ -59,6 +60,41 @@ void parse_commands(char *line, char **command_array) {
 
     command_array[index] = NULL;
 }
+
+/*
+    Adds spaces between special characters in the command line for easy separation.
+    The special characters are |, <, >, and ;
+
+    PARAMS
+        char *line: The input line.
+
+    RETURNS
+        A modified heap string, with whitespace between each found special character.
+        Must be freed.
+*/
+char *format_line(char *line) {
+    int line_size = strlen(line);
+
+    char *expanded_line = malloc(sizeof(char) * line_size * 2);
+    int index = 0;
+
+    for (int i = 0; i < line_size; ++i) {
+        char current = line[i];
+
+        // Insert spaces between special tokens for easy splitting
+        if (current == '|' || current == '<' || current == '>' || current == ';') {
+            expanded_line[index++] = ' ';
+            expanded_line[index++] = current;
+            expanded_line[index++] = ' ';
+        } else {
+            expanded_line[index++] = current;
+        }
+    }
+
+    return expanded_line;
+}
+
+char *tokenize_line(char *line) {}
 
 char *parse_stdin_redirect(char **arg_array) {
     char **current = arg_array;

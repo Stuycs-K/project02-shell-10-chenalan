@@ -8,6 +8,7 @@
 #include "exec.h"
 #include "parse.h"
 #include "shell.h"
+#include "command.h"
 
 /*
     Flag for whether the shell is currently running a command
