@@ -10,6 +10,13 @@
 #include "shell.h"
 
 /*
+    Flag for whether the shell is currently running a command
+    IDLE: 0
+    EXEC: 1
+*/
+int shell_status = SHELL_STATUS_IDLE;
+
+/*
     Prints the shell prompt. If stdin has been redirected, this prints nothing.
     The home directory, if present, is replaced with "~".
 
@@ -73,7 +80,7 @@ void run_commands(char **command_array) {
         char *arg_array[128];
         parse_command_args(*current_command, arg_array);
 
-        exec(arg_array);
+        int exit_status = exec(arg_array);
 
         current_command++;
     }
@@ -82,6 +89,8 @@ void run_commands(char **command_array) {
 /*
     Runs the main loop of the shell. Outputs the prompt, reads user input, parses,
     and runs commands.
+
+    shell_status is set to EXEC before run_commands and back to IDLE after it resolves.
 
     PARAMS
         None.
@@ -99,7 +108,9 @@ void shell_loop() {
     char *commands[256];
     parse_commands(line, commands);
 
+    shell_status = SHELL_STATUS_EXEC;
     run_commands(commands);
+    shell_status = SHELL_STATUS_IDLE;
 
     free(line);
 }

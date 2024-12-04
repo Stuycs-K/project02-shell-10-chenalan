@@ -9,7 +9,10 @@
 
 static void ignore_shell_signal(int signo) {
     printf("\n");
-    output_prompt();
+
+    if (shell_status == SHELL_STATUS_IDLE) {
+        output_prompt();
+    }
 }
 
 int main(int argc, char *argv[]) {
