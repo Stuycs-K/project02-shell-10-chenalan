@@ -1,7 +1,7 @@
 .PHONY: run clean compile
 
-compile shell: main.o parse.o exec.o cd.o redirection.o shell.o command.o
-	@gcc -o shell main.o parse.o exec.o cd.o redirection.o shell.o command.o
+compile shell: main.o parse.o exec.o cd.o shell.o command.o
+	@gcc -o shell main.o parse.o exec.o cd.o shell.o command.o
 
 run: shell
 	@./shell
@@ -20,9 +20,6 @@ exec.o: exec.c cd.h
 
 cd.o: cd.c
 	@gcc -c cd.c
-
-redirection.o: redirection.c
-	@gcc -c redirection.c
 
 shell.o: shell.c
 	@gcc -c shell.c

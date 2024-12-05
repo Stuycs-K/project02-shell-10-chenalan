@@ -147,7 +147,7 @@ CommandChain **build_command_chains(char **tokens) {
 
                 build_new_command_flag = 0;
             } else { // If we're not building a new command, keep adding onto the last command's arg list
-                command = last_command(current_chain);
+                command = current_chain->commands[current_chain->command_count - 1];
             }
 
             // Add to args list

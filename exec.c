@@ -11,7 +11,6 @@
 #include "command.h"
 #include "exec.h"
 #include "parse.h"
-#include "redirection.h"
 
 // To make the pipes easier to read
 #define WRITE_END 1

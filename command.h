@@ -3,6 +3,10 @@
 
 /*
     Command holds arguments for ONE command (e.g. ls -al)
+
+    char **args: The argument array.
+    int arg_count: The current number of arguments. Used for resizing.
+    int args_size: The current maximum number of char * in args. Used for resizing.
 */
 typedef struct {
     char **args;
@@ -11,10 +15,18 @@ typedef struct {
 } Command;
 
 /*
-    CommandChain holds a list of Commands. The output from each Command
-    will be piped into the subsequent Command.
+    CommandChain holds a sequence of commands. The output from each of its commands
+    will be piped into the subsequent command.
 
-    It also stores redirect information: the initial stdin and final stdout file paths.
+    The first command's input will be from in_file (default: stdin).
+    The last command's output will go to out_file (default: stdout).
+
+    Command **commands: The command array.
+    int command_count: The current number of commands. Used for resizing.
+    int commands_size: The current maximum number of Command * in commands. Used for resizing.
+
+    char *in_file: stdin will redirect to this. NULL (or stdin) by default.
+    char *out_file: stdout will redirect to this. NULL (or stdout) by default.
 */
 typedef struct {
     Command **commands;
@@ -38,8 +50,6 @@ Command *free_command(Command *command);
 CommandChain *new_command_chain();
 
 void insert_command(CommandChain *chain, Command *command);
-
-Command *last_command(CommandChain *chain);
 
 CommandChain *free_command_chain(CommandChain *chain);
 

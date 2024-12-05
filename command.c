@@ -4,6 +4,15 @@
 
 #include "command.h"
 
+/*
+    Constructs a new command. Initializes its argument array.
+
+    PARAMS
+        None.
+
+    RETURNS
+        The created command.
+*/
 Command *new_command() {
     Command *command = malloc(sizeof(Command));
 
@@ -14,6 +23,17 @@ Command *new_command() {
     return command;
 }
 
+/*
+    Inserts an argument into the command's argument array.
+    Resizes if necessary.
+
+    PARAMS
+        Command *command: The command.
+        char *arg: The argument to insert.
+
+    RETURNS
+        None
+*/
 void insert_arg(Command *command, char *arg) {
     if (command->arg_count >= command->args_size) {
         command->args_size *= 2;
@@ -23,6 +43,15 @@ void insert_arg(Command *command, char *arg) {
     command->args[command->arg_count++] = arg;
 }
 
+/*
+    Cleans up the command.
+
+    PARAMS
+        Command *command: The command.
+
+    RETURNS
+        NULL.
+*/
 Command *free_command(Command *command) {
     free(command->args);
 
@@ -31,6 +60,15 @@ Command *free_command(Command *command) {
     return NULL;
 }
 
+/*
+    Constructs a new command chain. Initializes its commands array.
+
+    PARAMS
+        None.
+
+    RETURNS
+        The new command chain.
+*/
 CommandChain *new_command_chain() {
     CommandChain *command_chain = malloc(sizeof(CommandChain));
 
@@ -41,6 +79,16 @@ CommandChain *new_command_chain() {
     return command_chain;
 }
 
+/*
+    Inserts a command into the chain's command array. Resizes if necessary
+
+    PARAMS
+        CommandChain *chain: The command chain.
+        Command *command: The command to insert.
+
+    RETURNS
+        None.
+*/
 void insert_command(CommandChain *chain, Command *command) {
     if (chain->command_count >= chain->commands_size) {
         chain->commands_size *= 2;
@@ -50,24 +98,45 @@ void insert_command(CommandChain *chain, Command *command) {
     chain->commands[chain->command_count++] = command;
 }
 
-Command *last_command(CommandChain *chain) {
-    if (chain->command_count == 0) {
-        return NULL;
-    }
+/*
+    Sets the command chain's redirect file for stdin.
 
-    return chain->commands[chain->command_count - 1];
-}
+    PARAMS
+        CommandChain *chain: The command chain.
+        char *file_name: A string containing the redirect file. Will be copied.
 
+    RETURNS
+        None.
+*/
 void set_in_file(CommandChain *chain, char *file_name) {
     chain->in_file = malloc(sizeof(char) * strlen(file_name));
     strcpy(chain->in_file, file_name);
 }
 
+/*
+    Sets the command chain's redirect file for stdout.
+
+    PARAMS
+        CommandChain *chain: The command chain.
+        char *file_name: A string containing the redirect file. Will be copied.
+
+    RETURNS
+        None.
+*/
 void set_out_file(CommandChain *chain, char *file_name) {
     chain->out_file = malloc(sizeof(char) * strlen(file_name));
     strcpy(chain->out_file, file_name);
 }
 
+/*
+    Cleans up the command chain and calls free_command on all its commands.
+
+    PARAMS
+        CommandChain *chain: The command chain.
+
+    RETURNS
+        NULL.
+*/
 CommandChain *free_command_chain(CommandChain *chain) {
     for (int i = 0; i < chain->command_count; ++i) {
         chain->commands[i] = free_command(chain->commands[i]);
