@@ -76,11 +76,14 @@ CommandChain *new_command_chain() {
     command_chain->commands_size = 64;
     command_chain->commands = malloc(sizeof(Command *) * command_chain->commands_size);
 
+    command_chain->in_file = NULL;
+    command_chain->out_file = NULL;
+
     return command_chain;
 }
 
 /*
-    Inserts a command into the chain's command array. Resizes if necessary
+    Inserts a command into the chain's command array. Resizes if necessary.
 
     PARAMS
         CommandChain *chain: The command chain.

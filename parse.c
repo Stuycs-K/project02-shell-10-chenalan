@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "command.h"
@@ -19,7 +20,7 @@
 char *format_line(char *line) {
     int line_size = strlen(line);
 
-    char *expanded_line = malloc(sizeof(char) * line_size * 3);
+    char *expanded_line = malloc(sizeof(char) * (line_size + 2) * 2);
     int index = 0;
 
     for (int i = 0; i < line_size; ++i) {
@@ -43,7 +44,8 @@ char *format_line(char *line) {
 }
 
 /*
-    Inserts whitespace-separated tokens into an array.
+    Inserts whitespace-separated tokens from an input line into an array.
+    The tokens can be separated with any number of spaces.
 
     PARAMS
         char *line: The input line.
@@ -51,7 +53,7 @@ char *format_line(char *line) {
         char **tokens: The array into which each token will be inserted.
 
     RETURNS
-        None
+        None.
 */
 void separate_tokens(char *line, char **tokens) {
     char *current = line;
@@ -98,6 +100,21 @@ void separate_tokens(char *line, char **tokens) {
     tokens[index] = NULL;
 }
 
+/*
+    The main parse function. Builds a list of command chains from a token list.
+    If we encounter ";", begin building a new command chain.
+    If we encounter "|", set a flag that the next word will go towards a new command.
+    If we encounter "<" or ">", set the input and output files of the current command chain.
+
+    Any other word is inserted to the current command's argument list.
+
+    PARAMS
+        char **tokens: The tokens.
+
+    RETURNS
+        An null-terminated array of command chains, each of which can be executed. 
+        Must be freed.
+*/
 CommandChain **build_command_chains(char **tokens) {
     CommandChain **command_chains = calloc(sizeof(CommandChain *), 512);
     command_chains[0] = new_command_chain(); // Initialize 1 chain
@@ -118,15 +135,27 @@ CommandChain **build_command_chains(char **tokens) {
 
         } else if (!strcmp(current_token, "<")) { // Redirect stdin
 
-            char *file_name = *(++token_pointer); // Consume next token as file input
-            set_in_file(current_chain, file_name);
+            char *next_token = *(++token_pointer);
+
+            if (!next_token) {
+                perror("shell: syntax error");
+                return command_chains;
+            }
+
+            set_in_file(current_chain, next_token);
 
             build_new_command_flag = 1;
 
         } else if (!strcmp(current_token, ">")) { // Redirect stdout
 
-            char *file_name = *(++token_pointer); // Consume next token as file input
-            set_out_file(current_chain, file_name);
+            char *next_token = *(++token_pointer);
+
+            if (!next_token) {
+                perror("shell: syntax error");
+                return command_chains;
+            }
+
+            set_out_file(current_chain, next_token);
 
             build_new_command_flag = 1;
 
@@ -157,5 +186,6 @@ CommandChain **build_command_chains(char **tokens) {
         token_pointer++;
     }
 
+    command_chains[++current_command_chain] = NULL;
     return command_chains;
 }

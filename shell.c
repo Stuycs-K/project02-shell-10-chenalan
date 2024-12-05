@@ -84,9 +84,7 @@ void run_commands(CommandChain **command_chains) {
     CommandChain **current_chain = command_chains;
     while (*current_chain) {
         exec_chain(*current_chain);
-        // int exit_status = exec(arg_array);
 
-        // TODO: Handle errors
         current_chain++;
     }
 }
@@ -128,5 +126,12 @@ void shell_loop() {
     while (*token_pointer) {
         free(*token_pointer);
         token_pointer++;
+    }
+
+    // Cleanup command chains
+    CommandChain **chain = command_chains;
+    while (*chain) {
+        free_command_chain(*chain);
+        chain++;
     }
 }
