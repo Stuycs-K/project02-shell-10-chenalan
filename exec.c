@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,6 +12,10 @@
 #include "exec.h"
 #include "parse.h"
 #include "redirection.h"
+
+// To make the pipes easier to read
+#define WRITE_END 1
+#define READ_END 0
 
 /*
     Used internally to print the corresponding error message when execvp fails,
@@ -55,14 +60,12 @@ int run_process(char **args) {
         } else {
             exit(0);
         }
-
     } else if (pid > 0) {
-        pid_t child_pid = waitpid(pid, &status, 0);
-
+        waitpid(pid, &status, 0);
         print_execvp_error(status);
 
-        return status;
-    } else {
+        return 0;
+    } else if (pid < 0) {
         perror("[exec]: Fork error");
         return -1;
     }
@@ -107,32 +110,45 @@ int exec_chain(CommandChain *chain) {
     int in_fd;
     int out_fd;
 
+    // First, set in_fd to the replacement stdin, if specified.
+    char *in_file = chain->in_file;
+    if (in_file) {
+        in_fd = open(in_file, O_RDONLY);
+    } else {
+        in_fd = dup(stdin_copy);
+    }
+
+    int pipe_fds[2];
+
     for (int i = 0; i < chain->command_count; ++i) {
         Command *command = chain->commands[i];
 
-        /*
-        char *in_file = command->in_file;
-        if (in_file) {
-            in_fd = redirect_stdin(in_file);
+        // If we don't close our descriptors as soon as possible, dup2 hangs FOREVER!
+        if (in_fd > -1) {
+            dup2(in_fd, STDIN_FILENO);
+            close(in_fd);
         }
 
-        char *out_file = command->out_file;
-        if (out_file) {
-            out_fd = redirect_stdout(out_file);
-        }
-
-        if (command->pipe) {
-            int pipe_fds[2];
+        // This is the last command, so redirect stdout if possible
+        if (i == chain->command_count - 1) {
+            char *out_file = chain->out_file;
+            if (out_file) {
+                out_fd = open(out_file, O_WRONLY | O_TRUNC | O_CREAT, 0644);
+            } else {
+                out_fd = dup(stdout_copy);
+            }
+        } else {
             pipe(pipe_fds);
 
-            dup2(out_fd, STDOUT_FILENO);
-
-            in_fd = pipe_fds[0];
-            out_fd = pipe_fds[1];
-
-            dup2(in_fd, STDIN_FILENO);
+            // Output goes to the write end of the pipe
+            out_fd = pipe_fds[WRITE_END];
+            // Set in_fd so the next command can read that output from the read end
+            in_fd = pipe_fds[READ_END];
         }
-        */
+
+        // Set stdout. If piped, this is the pipe write end. If not, it's the out file.
+        dup2(out_fd, STDOUT_FILENO);
+        close(out_fd);
 
         exec(command->args);
     }
