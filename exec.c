@@ -110,9 +110,7 @@ int exec_chain(CommandChain *chain) {
     for (int i = 0; i < chain->command_count; ++i) {
         Command *command = chain->commands[i];
 
-        if (command->pipe) {
-        }
-
+        /*
         char *in_file = command->in_file;
         if (in_file) {
             in_fd = redirect_stdin(in_file);
@@ -122,6 +120,19 @@ int exec_chain(CommandChain *chain) {
         if (out_file) {
             out_fd = redirect_stdout(out_file);
         }
+
+        if (command->pipe) {
+            int pipe_fds[2];
+            pipe(pipe_fds);
+
+            dup2(out_fd, STDOUT_FILENO);
+
+            in_fd = pipe_fds[0];
+            out_fd = pipe_fds[1];
+
+            dup2(in_fd, STDIN_FILENO);
+        }
+        */
 
         exec(command->args);
     }

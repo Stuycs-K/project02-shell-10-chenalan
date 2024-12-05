@@ -114,23 +114,19 @@ CommandChain **build_command_chains(char **tokens) {
 
         if (!strcmp(current_token, "|")) { // Pipe
 
-            Command *command = last_command(current_chain);
-            command->pipe = 1; // Mark this command as piped
             build_new_command_flag = 1;
 
         } else if (!strcmp(current_token, "<")) { // Redirect stdin
 
-            Command *command = last_command(current_chain);
             char *file_name = *(++token_pointer); // Consume next token as file input
-            set_in_file(command, file_name);
+            set_in_file(current_chain, file_name);
 
             build_new_command_flag = 1;
 
         } else if (!strcmp(current_token, ">")) { // Redirect stdout
 
-            Command *command = last_command(current_chain);
             char *file_name = *(++token_pointer); // Consume next token as file input
-            set_out_file(command, file_name);
+            set_out_file(current_chain, file_name);
 
             build_new_command_flag = 1;
 

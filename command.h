@@ -2,36 +2,36 @@
 #define COMMAND_H
 
 /*
-    Command holds arguments for ONE command (e.g. ls -al) and redirect information
-    So ls | wc will be split into two Commands
+    Command holds arguments for ONE command (e.g. ls -al)
 */
 typedef struct {
     char **args;
     int arg_count;
     int args_size;
-
-    char *in_file;
-    char *out_file;
-
-    int pipe;
 } Command;
 
 /*
-    CommandChain is a list of commands
+    CommandChain holds a list of Commands. The output from each Command
+    will be piped into the subsequent Command.
+
+    It also stores redirect information: the initial stdin and final stdout file paths.
 */
 typedef struct {
     Command **commands;
     int command_count;
     int commands_size;
+
+    char *in_file;
+    char *out_file;
 } CommandChain;
 
 Command *new_command();
 
 void insert_arg(Command *command, char *arg);
 
-void set_in_file(Command *command, char *file_name);
+void set_in_file(CommandChain *command, char *file_name);
 
-void set_out_file(Command *command, char *file_name);
+void set_out_file(CommandChain *command, char *file_name);
 
 Command *free_command(Command *command);
 

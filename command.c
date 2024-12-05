@@ -11,11 +11,6 @@ Command *new_command() {
     command->args_size = 64;
     command->args = malloc(sizeof(char *) * command->args_size);
 
-    command->in_file = NULL;
-    command->out_file = NULL;
-
-    command->pipe = 0;
-
     return command;
 }
 
@@ -28,20 +23,8 @@ void insert_arg(Command *command, char *arg) {
     command->args[command->arg_count++] = arg;
 }
 
-void set_in_file(Command *command, char *file_name) {
-    command->in_file = malloc(sizeof(char) * strlen(file_name));
-    strcpy(command->in_file, file_name);
-}
-
-void set_out_file(Command *command, char *file_name) {
-    command->out_file = malloc(sizeof(char) * strlen(file_name));
-    strcpy(command->out_file, file_name);
-}
-
 Command *free_command(Command *command) {
     free(command->args);
-    free(command->in_file);
-    free(command->out_file);
 
     free(command);
 
@@ -75,11 +58,23 @@ Command *last_command(CommandChain *chain) {
     return chain->commands[chain->command_count - 1];
 }
 
+void set_in_file(CommandChain *chain, char *file_name) {
+    chain->in_file = malloc(sizeof(char) * strlen(file_name));
+    strcpy(chain->in_file, file_name);
+}
+
+void set_out_file(CommandChain *chain, char *file_name) {
+    chain->out_file = malloc(sizeof(char) * strlen(file_name));
+    strcpy(chain->out_file, file_name);
+}
+
 CommandChain *free_command_chain(CommandChain *chain) {
     for (int i = 0; i < chain->command_count; ++i) {
         chain->commands[i] = free_command(chain->commands[i]);
     }
 
+    free(chain->in_file);
+    free(chain->out_file);
     free(chain);
 
     return NULL;
