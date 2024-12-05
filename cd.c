@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <pwd.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -143,6 +144,7 @@ int cd(char **argv) {
     free(expanded_path);
 
     if (result == -1) {
+        perror("[cd]");
         return errno;
     }
 
