@@ -13,22 +13,20 @@
         char *file_name: The file that will replace stdin.
 
     RETURNS
-        The file descriptor for the copied stdin.
+        None.
 */
-int redirect_stdin(char *file_name) {
+void redirect_stdin(char *file_name) {
     int handle = open(file_name, O_RDONLY);
     if (handle < 0) {
         perror("Could not open input file");
         exit(errno);
     }
 
-    int backup_stdin = dup(STDIN_FILENO);
+    dup(STDIN_FILENO);
 
     dup2(handle, STDIN_FILENO);
 
     close(handle);
-
-    return backup_stdin;
 }
 
 /*
@@ -39,20 +37,18 @@ int redirect_stdin(char *file_name) {
             Will be created if it does not exist.
 
     RETURNS
-        The file descriptor for the copied stdout.
+        None.
 */
-int redirect_stdout(char *file_name) {
-    int handle = open(file_name, O_CREAT | O_WRONLY, 0644);
+void redirect_stdout(char *file_name) {
+    int handle = open(file_name, O_CREAT | O_WRONLY | O_TRUNC, 0644);
     if (handle < 0) {
         perror("Could not create output file");
         exit(errno);
     }
 
-    int backup_stdout = dup(STDOUT_FILENO);
+    dup(STDOUT_FILENO);
 
     dup2(handle, STDOUT_FILENO);
 
     close(handle);
-
-    return backup_stdout;
 }

@@ -113,7 +113,11 @@ CommandChain **build_command_chains(char **tokens) {
         CommandChain *current_chain = command_chains[current_command_chain];
 
         if (!strcmp(current_token, "|")) { // Pipe
+
+            Command *command = last_command(current_chain);
+            command->pipe = 1; // Mark this command as piped
             build_new_command_flag = 1;
+
         } else if (!strcmp(current_token, "<")) { // Redirect stdin
 
             Command *command = last_command(current_chain);

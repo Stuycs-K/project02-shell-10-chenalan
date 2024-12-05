@@ -28,8 +28,8 @@ void print_execvp_error(int exit_status) {
 
     if (exit_value == 0) { // We're fine
         return;
-    } else { // exit_value is errno
-        printf("%s\n", strerror(exit_value));
+    } else {
+        perror(strerror(exit_value));
     }
 }
 
@@ -68,14 +68,6 @@ int run_process(char **args) {
     }
 }
 
-int exec_chain(CommandChain *chain) {
-    for (int i = 0; i < chain->command_count; ++i) {
-        Command *command = chain->commands[i];
-
-        exec(command->args);
-    }
-}
-
 /*
     Runs the command. If the command is built-in, such as "cd," we directly
     call the related function. Otherwise, we fork a new process and use execvp.
@@ -103,4 +95,26 @@ int exec(char **args) {
     }
 
     return run_process(args);
+}
+
+int exec_chain(CommandChain *chain) {
+    // All redirection is done before forking because the children will inherit the redirected files
+    int stdin_copy = dup(STDIN_FILENO);
+    int stdout_copy = dup(STDOUT_FILENO);
+
+    for (int i = 0; i < chain->command_count; ++i) {
+        Command *command = chain->commands[i];
+
+        char *in_file = command->in_file;
+        if (in_file) {
+            redirect_stdin(in_file);
+        }
+
+        char *out_file = command->out_file;
+        if (out_file) {
+            redirect_stdout(out_file);
+        }
+
+        exec(command->args);
+    }
 }

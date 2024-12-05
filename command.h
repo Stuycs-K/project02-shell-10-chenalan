@@ -13,12 +13,11 @@ typedef struct {
     char *in_file;
     char *out_file;
 
-    int in_file_fd;
-    int out_file_fd;
+    int pipe;
 } Command;
 
 /*
-    CommandChain is just a list of commands
+    CommandChain is a list of commands
 */
 typedef struct {
     Command **commands;

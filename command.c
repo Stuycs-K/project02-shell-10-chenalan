@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "command.h"
 
@@ -12,6 +13,8 @@ Command *new_command() {
 
     command->in_file = NULL;
     command->out_file = NULL;
+
+    command->pipe = 0;
 
     return command;
 }
@@ -33,9 +36,6 @@ void set_in_file(Command *command, char *file_name) {
 void set_out_file(Command *command, char *file_name) {
     command->out_file = malloc(sizeof(char) * strlen(file_name));
     strcpy(command->out_file, file_name);
-}
-
-void set_pipe(Command *first, Command *second) {
 }
 
 Command *free_command(Command *command) {
