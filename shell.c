@@ -116,6 +116,12 @@ void shell_loop() {
 
     separate_tokens(line, tokens);
 
+    char **t = tokens;
+    while (*t) {
+        printf("%s\n", *t);
+        t++;
+    }
+
     command_chains = build_command_chains(tokens);
 
     shell_status = SHELL_STATUS_EXEC;

@@ -6,63 +6,6 @@
 #include "parse.h"
 
 /*
-    Parses the arguments for a single command and its arguments into a
-    null-terminated argument array, which can then be passed into execvp.
-
-    The command name is always index 0.
-
-    PARAMS
-        char *line: The string to be parsed.
-
-        char **arg_array: Contains the whitespace-separated tokens in line.
-            It will be null-terminated.
-
-    RETURNS
-        void
-*/
-void parse_command_args(char *line, char **arg_array) {
-    char *current = line;
-    char *token;
-
-    int arg_id = 0;
-
-    while (token = strsep(&current, " ")) {
-        arg_array[arg_id++] = token;
-    }
-
-    arg_array[arg_id] = NULL;
-}
-
-/*
-    Parses a string possibly containing multiple commands separated by semicolons
-    into a null-terminated command array.
-
-    Each command string can then be parsed into the command and its arguments
-    with parse_command_args
-
-    PARAMS
-        char *line: The string to be parsed.
-
-        char **arg_array: Contains the semicolon-separated tokens (i.e. commands)
-            in line. It will be null-terminated.
-
-    RETURNS
-        void
-*/
-void parse_commands(char *line, char **command_array) {
-    char *current = line;
-    char *token;
-
-    int index = 0;
-
-    while (token = strsep(&current, ";")) {
-        command_array[index++] = token;
-    }
-
-    command_array[index] = NULL;
-}
-
-/*
     Adds spaces between special characters in the command line for easy separation.
     The special characters are |, <, >, and ;
 
@@ -122,10 +65,12 @@ void separate_tokens(char *line, char **tokens) {
         // Whitespace -> insert current token
         if (*current == ' ') {
             if (token_length > 0) {
-                char *string = malloc(sizeof(char) * token_length + 1);
+                // +1 for null
+                char *string = malloc(sizeof(char) * (token_length + 1));
 
-                // Copy the token; the extra byte will get nulled out.
+                // Copy the token and null out the final byte
                 strncpy(string, token, token_length);
+                string[token_length] = 0;
 
                 tokens[index++] = string;
 
@@ -144,7 +89,9 @@ void separate_tokens(char *line, char **tokens) {
             token = current;
         }
 
+        // Increment token length
         token_length++;
+
         current++;
     }
 
@@ -165,9 +112,9 @@ CommandChain **build_command_chains(char **tokens) {
     while (current_token = *token_pointer) {
         CommandChain *current_chain = command_chains[current_command_chain];
 
-        if (!strcmp(current_token, "|")) { // PIPE
+        if (!strcmp(current_token, "|")) { // Pipe
             build_new_command_flag = 1;
-        } else if (!strcmp(current_token, "<")) {
+        } else if (!strcmp(current_token, "<")) { // Redirect stdin
 
             Command *command = last_command(current_chain);
             char *file_name = *(++token_pointer); // Consume next token as file input
@@ -175,7 +122,7 @@ CommandChain **build_command_chains(char **tokens) {
 
             build_new_command_flag = 1;
 
-        } else if (!strcmp(current_token, ">")) {
+        } else if (!strcmp(current_token, ">")) { // Redirect stdout
 
             Command *command = last_command(current_chain);
             char *file_name = *(++token_pointer); // Consume next token as file input
@@ -189,7 +136,7 @@ CommandChain **build_command_chains(char **tokens) {
 
             build_new_command_flag = 1; // Next token (if any) we read should go to a new command
 
-        } else {
+        } else { // This is a command argument
 
             Command *command;
 
@@ -199,7 +146,7 @@ CommandChain **build_command_chains(char **tokens) {
                 insert_command(current_chain, command);
 
                 build_new_command_flag = 0;
-            } else {
+            } else { // If we're not building a new command, keep adding onto the last command's arg list
                 command = last_command(current_chain);
             }
 
