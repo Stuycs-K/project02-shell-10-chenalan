@@ -48,7 +48,7 @@ int run_process(char **args) {
 }
 
 /*
-    Runs the command. If the command is built-in, such as "cd," we directly
+    Executes one command. If the command is built-in, such as "cd," we directly
     call the related function. Otherwise, we fork a new process and use execvp.
 
     PARAMS
@@ -76,6 +76,17 @@ int exec(char **args) {
     return run_process(args);
 }
 
+/*
+    Runs one command chain. stdin is redirected initially, if instructed. Each
+    command pipes its output to the subsequent command. When we reach the last
+    command in the chain, we redirect stdout, if instructed.
+
+    PARAMS
+        CommandChain *chain: The command chain.
+
+    RETURNS
+        The exit status of the child process that ran the command.
+*/
 int exec_chain(CommandChain *chain) {
     // All redirection is done before forking because the children will inherit the redirected files
 
@@ -100,6 +111,7 @@ int exec_chain(CommandChain *chain) {
         Command *command = chain->commands[i];
 
         // If we don't close our descriptors as soon as possible, dup2 hangs FOREVER!
+        // First redirect input
         if (in_fd > -1) {
             dup2(in_fd, STDIN_FILENO);
             close(in_fd);

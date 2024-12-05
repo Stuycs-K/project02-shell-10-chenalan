@@ -1,26 +1,4 @@
-README.md
-cd.c
-cd.h
-cd.o
-command.c
-command.h
-command.o
-exec.c
-exec.h
-exec.o
-input.o
-main.c
-main.o
-makefile
-parse.c
-parse.h
-parse.o
-redirection.c
-redirection.h
-redirection.o
-shell
-shell.c
-shell.h
-shell.o
-t.txt
-test.txt
+ls; sleep 1; ls
+cd ..; ls
+ls | wc
+echo a b c d e f

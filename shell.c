@@ -10,6 +10,9 @@
 #include "parse.h"
 #include "shell.h"
 
+#define COLOR_BOLD  "\e[1m"
+#define COLOR_OFF   "\e[m"
+
 /*
     Flag for whether the shell is currently running a command
     IDLE: 0
@@ -36,7 +39,7 @@ void output_prompt() {
     char *wd = get_wd_absolute();
     shorten_homedir_in_path(wd);
 
-    printf("%s$ ", wd);
+    printf(COLOR_BOLD "%s$ " COLOR_OFF, wd);
     fflush(stdout);
 
     free(wd);
@@ -44,6 +47,7 @@ void output_prompt() {
 
 /*
     Reads a line from stdin. If fgets encounters EOF, the shell terminates.
+    The last newline is stripped.
 
     PARAMS
         None
@@ -72,10 +76,10 @@ char *read_line() {
 }
 
 /*
-    Executes each command.
+    Executes each command chain.
 
     PARAMS
-        char **command_array: An array of commands, not yet separated into arguments.
+        CommandChain **command_chains: The array of command chains.
 
     RETURNS
         None.
