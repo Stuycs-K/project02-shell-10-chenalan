@@ -24,4 +24,3 @@ shell.h
 shell.o
 t.txt
 test.txt
-~/Systems/p2$ 

@@ -99,22 +99,34 @@ int exec(char **args) {
 
 int exec_chain(CommandChain *chain) {
     // All redirection is done before forking because the children will inherit the redirected files
+
+    // Save normal stdin and stdout
     int stdin_copy = dup(STDIN_FILENO);
     int stdout_copy = dup(STDOUT_FILENO);
+
+    int in_fd;
+    int out_fd;
 
     for (int i = 0; i < chain->command_count; ++i) {
         Command *command = chain->commands[i];
 
+        if (command->pipe) {
+        }
+
         char *in_file = command->in_file;
         if (in_file) {
-            redirect_stdin(in_file);
+            in_fd = redirect_stdin(in_file);
         }
 
         char *out_file = command->out_file;
         if (out_file) {
-            redirect_stdout(out_file);
+            out_fd = redirect_stdout(out_file);
         }
 
         exec(command->args);
     }
+
+    // Restore stdin and stdout
+    dup2(stdin_copy, STDIN_FILENO);
+    dup2(stdout_copy, STDOUT_FILENO);
 }

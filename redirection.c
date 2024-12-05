@@ -13,20 +13,18 @@
         char *file_name: The file that will replace stdin.
 
     RETURNS
-        None.
+        The file descriptor of redirected stdin. Must close later.
 */
-void redirect_stdin(char *file_name) {
+int redirect_stdin(char *file_name) {
     int handle = open(file_name, O_RDONLY);
     if (handle < 0) {
         perror("Could not open input file");
         exit(errno);
     }
 
-    dup(STDIN_FILENO);
-
     dup2(handle, STDIN_FILENO);
 
-    close(handle);
+    return handle;
 }
 
 /*
@@ -37,18 +35,16 @@ void redirect_stdin(char *file_name) {
             Will be created if it does not exist.
 
     RETURNS
-        None.
+        The file descriptor of redirected stdout. Must close later.
 */
-void redirect_stdout(char *file_name) {
+int redirect_stdout(char *file_name) {
     int handle = open(file_name, O_CREAT | O_WRONLY | O_TRUNC, 0644);
     if (handle < 0) {
         perror("Could not create output file");
         exit(errno);
     }
 
-    dup(STDOUT_FILENO);
-
     dup2(handle, STDOUT_FILENO);
 
-    close(handle);
+    return handle;
 }
