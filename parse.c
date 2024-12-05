@@ -76,7 +76,7 @@ void parse_commands(char *line, char **command_array) {
 char *format_line(char *line) {
     int line_size = strlen(line);
 
-    char *expanded_line = malloc(sizeof(char) * line_size * 2);
+    char *expanded_line = malloc(sizeof(char) * line_size * 3);
     int index = 0;
 
     for (int i = 0; i < line_size; ++i) {
@@ -91,6 +91,8 @@ char *format_line(char *line) {
             expanded_line[index++] = current;
         }
     }
+    expanded_line[index++] = ' ';
+    expanded_line[index++] = 0;
 
     free(line);
 
@@ -110,12 +112,40 @@ char *format_line(char *line) {
 */
 void separate_tokens(char *line, char **tokens) {
     char *current = line;
-    char *token;
+
+    char *token = NULL;
+    int token_length = 0;
 
     int index = 0;
 
-    while (token = strsep(&current, " ")) {
-        tokens[index++] = token;
+    while (*current) {
+        // Whitespace -> insert current token
+        if (*current == ' ') {
+            if (token_length > 0) {
+                char *string = malloc(sizeof(char) * token_length + 1);
+
+                // Copy the token; the extra byte will get nulled out.
+                strncpy(string, token, token_length);
+
+                tokens[index++] = string;
+
+                token_length = 0;
+            }
+
+            // Reset token pointer
+            token = NULL;
+
+            current++;
+            continue;
+        }
+
+        // Set pointer to start of first string
+        if (token == NULL) {
+            token = current;
+        }
+
+        token_length++;
+        current++;
     }
 
     tokens[index] = NULL;

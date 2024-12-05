@@ -72,11 +72,6 @@ int exec_chain(CommandChain *chain) {
     for (int i = 0; i < chain->command_count; ++i) {
         Command *command = chain->commands[i];
 
-        char **p = command->args;
-        while (*p) {
-            printf("%s\n", *p);
-            p++;
-        }
         exec(command->args);
     }
 }
