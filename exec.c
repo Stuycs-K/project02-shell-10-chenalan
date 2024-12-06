@@ -79,15 +79,15 @@ int exec(char **args) {
     command pipes its output to the subsequent command. When we reach the last
     command in the chain, we redirect stdout, if instructed.
 
+    All redirection is done before forking because the children will inherit the redirected files.
+
     PARAMS
         CommandChain *chain: The command chain.
 
     RETURNS
-        The exit status of the child process that ran the command.
+        None.
 */
-int exec_chain(CommandChain *chain) {
-    // All redirection is done before forking because the children will inherit the redirected files
-
+void exec_chain(CommandChain *chain) {
     // Save normal stdin and stdout
     int stdin_copy = dup(STDIN_FILENO);
     int stdout_copy = dup(STDOUT_FILENO);
@@ -117,9 +117,14 @@ int exec_chain(CommandChain *chain) {
                 out_fd = dup(stdout_copy);
             }
         } else {
-            out_fd = open(TEMP_PIPE_FILE, O_CREAT | O_WRONLY, 0644);
+            // Open the temp file to WRITE (pipe write end)
+            out_fd = open(TEMP_PIPE_FILE, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+
+            // Open the same file to READ (pipe read end). The next iteration will use this as its input.
             in_fd = open(TEMP_PIPE_FILE, O_RDONLY);
 
+            // Remove the file immediately from the directory. Apparently, we can still
+            // read and write to the file, but it won't appear in ls
             remove(TEMP_PIPE_FILE);
         }
 
