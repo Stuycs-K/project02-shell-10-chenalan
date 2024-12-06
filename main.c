@@ -7,6 +7,17 @@
 
 #include "shell.h"
 
+/*
+    Prevents the shell from terminating on SIGINT, SIGQUIT, and SIGTSTP.
+    Outputs a new prompt if no child processes are currently running (this is race condition
+    unsafe).
+
+    PARAMS
+        int signo: The signal number.
+
+    RETURN
+        None
+*/
 static void ignore_signal(int signo) {
     printf("\n");
 

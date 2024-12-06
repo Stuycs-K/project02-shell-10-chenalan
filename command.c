@@ -102,7 +102,8 @@ void insert_command(CommandChain *chain, Command *command) {
 }
 
 /*
-    Sets the command chain's redirect file for stdin.
+    Sets the command chain's redirect file for stdin. If a redirect file is
+    already set, it is overriden.
 
     PARAMS
         CommandChain *chain: The command chain.
@@ -112,12 +113,17 @@ void insert_command(CommandChain *chain, Command *command) {
         None.
 */
 void set_in_file(CommandChain *chain, char *file_name) {
+    if (chain->in_file) {
+        free(chain->in_file);
+    }
     chain->in_file = malloc(sizeof(char) * strlen(file_name));
+
     strcpy(chain->in_file, file_name);
 }
 
 /*
-    Sets the command chain's redirect file for stdout.
+    Sets the command chain's redirect file for stdout. If a redirect file is
+    already set, it is overriden.
 
     PARAMS
         CommandChain *chain: The command chain.
@@ -127,7 +133,11 @@ void set_in_file(CommandChain *chain, char *file_name) {
         None.
 */
 void set_out_file(CommandChain *chain, char *file_name) {
+    if (chain->out_file) {
+        free(chain->out_file);
+    }
     chain->out_file = malloc(sizeof(char) * strlen(file_name));
+
     strcpy(chain->out_file, file_name);
 }
 
