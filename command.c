@@ -103,7 +103,7 @@ void insert_command(CommandChain *chain, Command *command) {
 
 /*
     Sets the command chain's redirect file for stdin. If a redirect file is
-    already set, it is overriden.
+    already set, it is overridden.
 
     PARAMS
         CommandChain *chain: The command chain.
@@ -123,7 +123,7 @@ void set_in_file(CommandChain *chain, char *file_name) {
 
 /*
     Sets the command chain's redirect file for stdout. If a redirect file is
-    already set, it is overriden.
+    already set, it is overridden.
 
     PARAMS
         CommandChain *chain: The command chain.

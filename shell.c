@@ -22,10 +22,10 @@ int shell_status = SHELL_STATUS_IDLE;
     The home directory, if present, is replaced with "~".
 
     PARAMS
-        None
+        None.
 
     RETURNS
-        None
+        None.
 */
 void output_prompt(void) {
     // If stdin's been redirected, don't output the prompt!
@@ -47,7 +47,7 @@ void output_prompt(void) {
     The last newline is stripped.
 
     PARAMS
-        None
+        None.
 
     RETURNS
         A heap string containing the read line. Must be freed.
