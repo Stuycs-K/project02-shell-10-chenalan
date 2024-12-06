@@ -1,4 +1,0 @@
-ls; sleep 1; ls
-cd ..; ls
-ls | wc
-echo a b c d e f

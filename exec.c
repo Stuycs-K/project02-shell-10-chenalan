@@ -12,9 +12,7 @@
 #include "exec.h"
 #include "parse.h"
 
-// To make the pipes easier to read
-#define WRITE_END 1
-#define READ_END 0
+#define TEMP_PIPE_FILE "__temp__"
 
 /*
     Forks to run a command with execvp, for which the parent process waits.
@@ -98,40 +96,31 @@ int exec_chain(CommandChain *chain) {
     int out_fd;
 
     // First, set in_fd to the replacement stdin, if specified.
-    char *in_file = chain->in_file;
-    if (in_file) {
-        in_fd = open(in_file, O_RDONLY);
+    if (chain->in_file) {
+        in_fd = open(chain->in_file, O_RDONLY);
     } else {
         in_fd = dup(stdin_copy);
     }
 
-    int pipe_fds[2];
-
     for (int i = 0; i < chain->command_count; ++i) {
         Command *command = chain->commands[i];
 
-        // If we don't close our descriptors as soon as possible, dup2 hangs FOREVER!
         // First redirect input
-        if (in_fd > -1) {
-            dup2(in_fd, STDIN_FILENO);
-            close(in_fd);
-        }
+        dup2(in_fd, STDIN_FILENO);
+        close(in_fd);
 
         // This is the last command, so redirect stdout if possible
         if (i == chain->command_count - 1) {
-            char *out_file = chain->out_file;
-            if (out_file) {
-                out_fd = open(out_file, O_WRONLY | O_TRUNC | O_CREAT, 0644);
+            if (chain->out_file) {
+                out_fd = open(chain->out_file, O_WRONLY | O_TRUNC | O_CREAT, 0644);
             } else {
                 out_fd = dup(stdout_copy);
             }
         } else {
-            pipe(pipe_fds);
+            out_fd = open(TEMP_PIPE_FILE, O_CREAT | O_WRONLY, 0644);
+            in_fd = open(TEMP_PIPE_FILE, O_RDONLY);
 
-            // Output goes to the write end of the pipe
-            out_fd = pipe_fds[WRITE_END];
-            // Set in_fd so the next command can read that output from the read end
-            in_fd = pipe_fds[READ_END];
+            remove(TEMP_PIPE_FILE);
         }
 
         // Set stdout. If piped, this is the pipe write end. If not, it's the out file.
@@ -144,4 +133,7 @@ int exec_chain(CommandChain *chain) {
     // Restore stdin and stdout
     dup2(stdin_copy, STDIN_FILENO);
     dup2(stdout_copy, STDOUT_FILENO);
+
+    close(stdin_copy);
+    close(stdout_copy);
 }
