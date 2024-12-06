@@ -10,9 +10,6 @@
 #include "parse.h"
 #include "shell.h"
 
-#define COLOR_BOLD  "\e[1m"
-#define COLOR_OFF   "\e[m"
-
 /*
     Flag for whether the shell is currently running a command
     IDLE: 0
@@ -30,7 +27,7 @@ int shell_status = SHELL_STATUS_IDLE;
     RETURNS
         None
 */
-void output_prompt() {
+void output_prompt(void) {
     // If stdin's been redirected, don't output the prompt!
     if (!isatty(STDIN_FILENO)) {
         return;
@@ -55,7 +52,7 @@ void output_prompt() {
     RETURNS
         A heap string containing the read line. Must be freed.
 */
-char *read_line() {
+char *read_line(void) {
     char *line = malloc(sizeof(char) * 512);
 
     char *fgets_result = fgets(line, 512, stdin);

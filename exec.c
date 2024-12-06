@@ -16,15 +16,14 @@
 
 /*
     Forks to run a command with execvp, for which the parent process waits.
-    Errors are outputted to the shell with printf (will change).
 
     PARAMS
         char **args: The array of command arguments. Unused for parent process.
 
     RETURNS
-        The parent process returns the child process's exit status.
+        None.
 */
-int run_process(char **args) {
+void run_process(char **args) {
     pid_t pid = fork();
 
     int status = 0;
@@ -32,16 +31,20 @@ int run_process(char **args) {
     if (pid == 0) {
         int result = execvp(args[0], args);
         if (result == -1) {
+
+            // Command not found
+            if (errno == ENOENT) {
+                perror("[exec]");
+            }
+
             exit(errno);
         } else {
             exit(0);
         }
     } else if (pid > 0) {
         waitpid(pid, &status, 0);
-        return 0;
     } else if (pid < 0) {
         perror("[exec]: Fork error");
-        return -1;
     }
 }
 
@@ -53,25 +56,25 @@ int run_process(char **args) {
         char **args: The array of command arguments.
 
     RETURNS
-        The exit status of the child process that ran the command.
+        None.
 */
-int exec(char **args) {
+void exec(char **args) {
     char *command = args[0];
 
     // Do nothing if there's no command! This is so simply pressing enter doesn't output an error message.
     if (command[0] == 0) {
-        return 0;
+        return;
     }
 
     // Run our built-in commands here. Don't fork for any of them.
     if (!strcmp(command, "cd")) {
         cd(args);
-        return 0;
+        return;
     } else if (!strcmp(command, "exit")) {
         exit(0);
     }
 
-    return run_process(args);
+    run_process(args);
 }
 
 /*

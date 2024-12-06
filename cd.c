@@ -125,9 +125,9 @@ char *expand_homedir_in_path(char *path) {
             a path.
 
     RETURNS
-        0 if chdir succeeded, errno otherwise
+        None.
 */
-int cd(char **argv) {
+void cd(char **argv) {
     char *path = argv[1];
 
     char *expanded_path = NULL;
@@ -145,8 +145,5 @@ int cd(char **argv) {
 
     if (result == -1) {
         perror("[cd]");
-        return errno;
     }
-
-    return 0;
 }

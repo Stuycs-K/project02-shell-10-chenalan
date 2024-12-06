@@ -1,6 +1,8 @@
 # program name
 shell
 
+.vscode
+
 # Prerequisites
 *.d
 
