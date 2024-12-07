@@ -20,6 +20,7 @@ In addition to all required features:
 * Don't expect amazing error handling
 
 ## Documentation
+
 ### `command.h`
 #### Structs
 ```c
@@ -251,5 +252,79 @@ void exec(char **args);
         None.
 */
 void exec_chain(CommandChain *chain);
+
+```
+
+### `shell.h`
+#### Functions
+```c
+
+/*
+    Prints the shell prompt. If stdin has been redirected, this prints nothing.
+    The home directory, if present, is replaced with "~".
+
+    PARAMS
+        None.
+
+    RETURNS
+        None.
+*/
+void output_prompt(void);
+
+/*
+    Reads a line from stdin. If fgets encounters EOF, the shell terminates.
+    The last newline is stripped.
+
+    PARAMS
+        None.
+
+    RETURNS
+        A heap string containing the read line. Must be freed.
+*/
+char *read_line(void);
+
+/*
+    Executes each command chain.
+
+    PARAMS
+        CommandChain **command_chains: The array of command chains.
+
+    RETURNS
+        None.
+*/
+void run_commands(CommandChain **command_chains);
+
+/*
+    Runs the main loop of the shell. Outputs the prompt, reads user input, parses,
+    and runs commands.
+
+    shell_status is set to EXEC before run_commands and back to IDLE after it resolves.
+
+    PARAMS
+        None.
+
+    RETURNS
+        None.
+*/
+void shell_loop(void);
+
+```
+
+### `main.c`
+#### Functions
+```c
+
+/*
+    Prevents the shell from terminating on SIGINT, SIGQUIT, and SIGTSTP.
+    Outputs a new prompt if no child processes are currently running (this is race condition
+    unsafe).
+
+    PARAMS
+        int signo: The signal number.
+
+    RETURN
+        None
+*/
+static void ignore_signal(int signo);
 
 ```

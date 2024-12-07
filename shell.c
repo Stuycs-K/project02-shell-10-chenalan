@@ -102,7 +102,7 @@ void run_commands(CommandChain **command_chains) {
     RETURNS
         None.
 */
-void shell_loop() {
+void shell_loop(void) {
     char *line;
     char *tokens[2048];
 
@@ -135,4 +135,4 @@ void shell_loop() {
         free_command_chain(*chain);
         chain++;
     }
-}
+    free(command_chains);
