@@ -41,7 +41,7 @@ void insert_arg(Command *command, char *arg) {
     }
 
     command->args[command->arg_count++] = arg;
-    command->args[command->arg_count++] = 0; // MUST KEEP ARGS NULL-TERMINATED!
+    command->args[command->arg_count] = NULL; // MUST KEEP ARGS NULL-TERMINATED!
 }
 
 /*
