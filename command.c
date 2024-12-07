@@ -41,6 +41,7 @@ void insert_arg(Command *command, char *arg) {
     }
 
     command->args[command->arg_count++] = arg;
+    command->args[command->arg_count++] = 0; // MUST KEEP ARGS NULL-TERMINATED!
 }
 
 /*
@@ -53,6 +54,9 @@ void insert_arg(Command *command, char *arg) {
         NULL.
 */
 Command *free_command(Command *command) {
+    for (int i = 0; i < command->arg_count; ++i) {
+        free(command->args[i]);
+    }
     free(command->args);
 
     free(command);

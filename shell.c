@@ -112,6 +112,7 @@ void shell_loop(void) {
 
     line = read_line();
     line = format_line(line);
+
     separate_tokens(line, tokens);
 
     command_chains = build_command_chains(tokens);
@@ -122,13 +123,6 @@ void shell_loop(void) {
 
     free(line);
 
-    // Cleanup tokens
-    char **token_pointer = tokens;
-    while (*token_pointer) {
-        free(*token_pointer);
-        token_pointer++;
-    }
-
     // Cleanup command chains
     CommandChain **chain = command_chains;
     while (*chain) {
@@ -136,3 +130,4 @@ void shell_loop(void) {
         chain++;
     }
     free(command_chains);
+}

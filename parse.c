@@ -1,6 +1,6 @@
 #include <stddef.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "command.h"
@@ -112,7 +112,7 @@ void separate_tokens(char *line, char **tokens) {
         char **tokens: The tokens.
 
     RETURNS
-        An null-terminated array of command chains, each of which can be executed. 
+        An null-terminated array of command chains, each of which can be executed.
         Must be freed.
 */
 CommandChain **build_command_chains(char **tokens) {
