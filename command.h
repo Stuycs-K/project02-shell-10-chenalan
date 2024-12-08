@@ -8,7 +8,7 @@
     int arg_count: The current number of arguments. Used for resizing.
     int args_size: The current maximum number of char * in args. Used for resizing.
 */
-typedef struct {
+typedef struct Command {
     char **args;
     int arg_count;
     int args_size;
@@ -28,7 +28,7 @@ typedef struct {
     char *in_file: stdin will redirect to this. NULL (or stdin) by default.
     char *out_file: stdout will redirect to this. NULL (or stdout) by default.
 */
-typedef struct {
+typedef struct CommandChain {
     Command **commands;
     int command_count;
     int commands_size;

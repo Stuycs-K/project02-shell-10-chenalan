@@ -23,11 +23,18 @@ char *format_line(char *line) {
     char *expanded_line = malloc(sizeof(char) * (line_size + 2) * 2);
     int index = 0;
 
+    int is_building_string_literal = 0; // For " "
+
     for (int i = 0; i < line_size; ++i) {
         char current = line[i];
 
+        // Encountering " or ' -> don't treat anything after as a special token
+        if (current == '\'' || current == '\"') { 
+            is_building_string_literal = is_building_string_literal ? 0 : 1;
+        }
+
         // Insert spaces between special tokens for easy splitting
-        if (current == '|' || current == '<' || current == '>' || current == ';') {
+        if (!is_building_string_literal && (current == '|' || current == '<' || current == '>' || current == ';')) {
             expanded_line[index++] = ' ';
             expanded_line[index++] = current;
             expanded_line[index++] = ' ';
@@ -63,9 +70,20 @@ void separate_tokens(char *line, char **tokens) {
 
     int index = 0;
 
+    int is_building_string_literal = 0;
+
     while (*current) {
+        // Toggle string literal flag
+        if (*current == '\'' || *current == '\"') {
+            is_building_string_literal = is_building_string_literal ? 0 : 1;
+
+            // Skip the quotes themselves
+            current++;
+            continue;
+        }
+
         // Whitespace -> insert current token
-        if (*current == ' ') {
+        if (!is_building_string_literal && *current == ' ') {
             if (token_length > 0) {
                 // +1 for null
                 char *string = malloc(sizeof(char) * (token_length + 1));
