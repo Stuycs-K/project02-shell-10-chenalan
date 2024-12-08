@@ -255,6 +255,75 @@ void exec_chain(CommandChain *chain);
 
 ```
 
+### `cd.h`
+#### Functions
+```c
+
+/*
+    Returns a string containing the absolute path to the working directory
+
+    PARAMS
+        None
+
+    RETURNS
+        A heap string with the absolute path. Must be freed.
+*/
+char *get_wd_absolute(void);
+
+/*
+    Returns a string containing the home directory.
+    Source: https://stackoverflow.com/questions/2910377/get-home-directory-in-linux
+
+    PARAMS
+        None
+
+    RETURNS
+        A heap string with the home directory. Must be freed.
+*/
+char *get_homedir(void);
+
+/*
+    Shortens a path by replacing the home directory (if found) with "~".
+
+    PARAMS
+        char *wd: The buffer containing the absolute path. Will be modified.
+
+    RETURNS
+        None. There's no need to create a new buffer, as path will
+        have enough space for the shortened path.
+*/
+void shorten_homedir_in_path(char *path);
+
+/*
+    Used internally. Expands "~" in a path by replacing it with the home directory.
+
+    PARAMS
+        char *path: The buffer containing the path relative to the home directory.
+
+    RETURNS
+        A new heap buffer containing the expanded path. Must be freed.
+        If the path does not contain "~", returns a copy of the path passed in.
+*/
+char *expand_homedir_in_path(char *path);
+
+/*
+    Runs the cd command. Changes the working directory to the one requested,
+    returning errno if something goes wrong. If no path is specified,
+    the path will be the home directory. "~" at the beginning of a path will be expanded
+    into the home directory.
+
+    PARAMS
+        char **argv: The argument array normally passed into execvp. The first
+            argument should be "cd," and the next could either contain NULL or
+            a path.
+
+    RETURNS
+        None.
+*/
+void cd(char **argv);
+
+```
+
 ### `shell.h`
 #### Functions
 ```c
