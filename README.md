@@ -8,16 +8,21 @@
 ## Features
 In addition to all required features:
 * Home directory in prompt replaced with `~`
-* `cd` expands to `cd ~`, and `~` will expand to the home directory
+* `cd` expands to `cd ~`, and `~` expands to the home directory
 * Commands can be separated with any number of whitespace characters (e.g. `ls ; sleep  1; ls` is valid)
 * Sending `SIGINT`, `SIGQUIT`, or `SIGTSTP` will only affect child processes; the shell will continue running
 * Works to a reasonable degree with multiple pipes (e.g. `ls | wc -l | cowsay`)
 * Supports multiple redirect operators (`<` and `>`), in any order (e.g. `wc < shell.h > output.txt < shell.c`)
     * Redirect operators are read left-to-right; if there's multiple of the same redirect operator, only the file following the right-most operator will be used as the redirect
     * Behavior differs from bash in that intermediate stdout redirect files will not be created. For example, in bash, the command `ls > f1 > f2` will create files `f1` and `f2`. `f1` will be empty, and `f2` will contain the output of `ls`. Here, the same command will only create and redirect stdout into `f2`
+* Supports command arguments in quotations (e.g. `cat "spaced out"` or `cat 'spaced out`)
 
-## Notes
+## Unimplemented Features
+* Supporting more operators such as `&&` and `||`
+
+## Potential Issues
 * Don't expect amazing error handling
+* Because the shell uses temporary files to handle piping, `wc` can estimate column widths from the temporary pipe file's metadata. Thus, its output does not use maximum column space padding. As a result, `echo "hello hello" | wc` will output ` 1  2 12` instead of `      1       2      12`
 
 ## Documentation
 
